@@ -1,0 +1,179 @@
+#import libarary
+import numpy as np
+import pandas as pd
+import matplotlib.pyplot as plt
+%matplotlib inline
+from sklearn.model_selection import train_test_split
+from sklearn.metrics import accuracy_score
+from sklearn.tree import DecisionTreeClassifier
+import seaborn as sns; sns.set()
+import warnings
+warnings.filterwarnings('ignore')
+#========================dataset====================================
+heatr_data= pd.read_excel('D:/dataset/Heart.xlsx',header=0)
+# print(heatr_data)
+#=========================================================
+X = heatr_data.values[:,:7]
+y = heatr_data.values[:,7]
+# print(X)
+# print(y)
+
+#==================================================
+# the counts ndim dataset
+heatr_data.ndim
+
+#================================
+#this is describe
+heatr_data.describe()
+#========================================
+#5 is the last row of the data
+heatr_data.tail()
+#================================================
+#Fills NA / NaN values using the specified method.
+heatr_data.fillna
+#============================================
+#chake in value mesing
+heatr_data.isnull().sum()
+#========================================
+# counts sick heart 
+heatr_data['sick'].value_counts()
+#=================================================
+# counts sick heart 
+heatr_data['sick'].value_counts()
+#======================================================
+X=heatr_data['sick'].values
+y = heatr_data['CKMB pri'].values
+#========================================
+# X
+#==========================
+#y
+#=========================================
+# chake in valuese mesing heatr_data[CKMB pri] and heatr_data[Troponin Q]
+print(heatr_data['CKMB pri'].isnull().sum())
+print(heatr_data['Troponin Q'].isnull().sum())
+#==============================================================================
+heatr_data.shape
+#============================================
+# chak Qualitative tryponin
+heatr_data['Troponin Q'].value_counts
+#======================================================
+# counts sex betwen male and female
+heatr_data['Gender'].value_counts()
+#======================================================
+X = heatr_data.drop(columns='sick',axis=1)
+y = heatr_data['sick']
+#===============================================
+X
+#========================================
+y
+#==================================
+#Measurement of statistical data
+heatr_data.head()
+#========================================
+# Data specifications
+heatr_data.info()
+#==========================================
+# Apply the default theme
+heatr_data.hist(figsize=(12, 12),layout=(5, 3));
+#=====================================================
+#Check the relationships between the columns
+heatr_data.corr()
+#======================================================
+# plt.figure(figsize=(20,20))
+# sns.heatmap(heatr_data.corr(),annot=True,cmap='terrain');
+#===========================describe===============================================
+#Of course, the plot can be drawn from the above method,
+#ut the difference is in the color of the plot
+# ===========================================================
+# plt.figure(figsize=(20,20))
+# sns.heatmap(heatr_data.corr(),annot=True,cmap='terrain');
+#===========================describe===============================================
+#Of course, the plot can be drawn from the above method,
+#ut the difference is in the color of the plot
+# ===========================================================
+# plt.figure(figsize=(20,20))
+# sns.heatmap(heatr_data.corr(),annot=True,cmap='terrain');
+#===========================describe===============================================
+#Of course, the plot can be drawn from the above method,
+#ut the difference is in the color of the plot
+# ===========================================================
+corrmat = heatr_data.corr()
+# plot heat map
+top_corr_features=corrmat.index
+plt.figure(figsize=(20, 20))
+g = sns.heatmap(heatr_data[top_corr_features].corr(),annot=True,cmap="RdYlGn")
+#================================================================================
+#In the plot below the green diameter is the number 1, 
+#and the other colors represent the positive or negative
+# of the data columns.
+sns.heatmap(heatr_data.corr(),square=True,cmap="RdYlGn");
+#=============================================================================
+#Discover duplicates
+heatr_data.duplicated()
+#=================================================
+sns.countplot(x="sick", data=heatr_data, palette="bwr")
+plt.show()
+#===========================================================
+#Check to remove duplicates
+heatr_data.drop_duplicates()
+#==============================================================
+countNoDisease = len(heatr_data[heatr_data.sick ==3])
+countHaveDisease = len(heatr_data[heatr_data.sick == 2])
+print("Percentage of Patients Havent Heart Disease: {:.2f}%".format((countNoDisease / (len(heatr_data.sick))*100)))
+print("Percentage of Patients Have Heart Disease: {:.2f}%".format((countHaveDisease / (len(heatr_data.sick))*100)))
+#======================================================================================================================
+sns.countplot(x='Gender', data=heatr_data, palette="mako_r")
+plt.xlabel("Gender (0 = female, 1= male)")
+plt.show()
+#================================================================================
+#Removal of some cells by Drupna
+heatr_data.dropna()
+#============================================================
+heatr_data = pd.get_dummies(heatr_data, drop_first=True)
+heatr_data.head()
+#==============================================================
+#Creat split
+X_train, X_test, y_train, y_test = train_test_split(X,y,test_size =0.33, random_state = 42)
+#===============================================================================================
+print(X.shape,X_train.shape,X_test.shape)
+#================================================
+male =0
+femal =1
+if male > femal:
+    print("Myocardial infarction is more common in men than women")
+elif male == femal:
+    print("Myocardial infarction is equal in men and women")
+else:
+    print("Myocardial infarction is more common in women than men")
+#=========================================================================
+model = DecisionTreeClassifier(random_state=42)
+#==================================================
+model = DecisionTreeClassifier(
+    criterion="entropy",
+    splitter='best',
+    max_depth=2,
+    min_samples_split=0.2,
+    min_samples_leaf=3,
+    min_weight_fraction_leaf=0.2,
+    max_features="log2",
+    random_state=42,
+    max_leaf_nodes=3,
+    min_impurity_decrease=0.2,
+    min_impurity_split=0.2,
+    class_weight="balanced",
+    ccp_alpha=0.15,)
+
+
+model.fit(X_train, y_train)
+model_predict= model.predict(X_test)
+model.score(X_train,y_train)
+#====================================================================================
+#In this part, we draw results from the test data
+model = DecisionTreeClassifier()
+model.fit(X_test, y_test)
+#===================================================================
+X_test_prediction = model.predict(X_test)
+test_data_accuracy =accuracy_score(X_test_prediction,y_test)
+print('Accuracy on Test data : ',test_data_accuracy)
+
+
